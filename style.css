@@ -1,0 +1,33 @@
+/* whole document */
+
+
+
+
+
+
+
+
+/* home bar */
+
+
+
+
+
+
+
+
+
+/* home or index.hmtl */
+
+#home-body{
+    background-image: url(images/gallery/plantmorning.png);
+    
+    background-repeat: no-repeat;
+    background-size: cover;
+    }
+
+#home-portrait{
+    color:black;
+}
+
+
