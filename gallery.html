@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div class="home-bar">
+        <div id="logo">
+            <img src="images/svg/logo-schwarz.svg" alt="OZEMI">
+        </div>
+        <div id="page-links">
+            <a href="index.html">HOME</a>
+            <a href="gallery.html">GALLERY</a>
+            <a href="projects.html">PROJECTS</a>
+            <a href="about.html">ABOUT</a>
+        </div>
+
+    </div>
+
+
+    <style>
+      
+
+        /* === Das Herzstück: Multi-Column-Layout === */
+        .gallery {
+            column-count: 3;
+            /* 3 Spalten */
+            column-gap: 16px;
+            /* Abstand zwischen den Spalten */
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2vw 5vw;
+        }
+
+        .gallery-item {
+            break-inside: avoid;
+            /* verhindert, dass ein Bild über 2 Spalten zerschnitten wird */
+            margin-bottom: 16px;
+            border-radius: 8px;
+            overflow: hidden;
+
+            /* Start-Zustand für die Animation */
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+
+        .gallery-item.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .gallery-item img {
+            width: 100%;
+            display: block;
+        }
+
+        /* Bei schmalen Bildschirmen weniger Spalten */
+        @media (max-width: 700px) {
+            .gallery {
+                column-count: 2;
+            }
+        }
+
+        @media (max-width: 420px) {
+            .gallery {
+                column-count: 1;
+            }
+        }
+    </style>
+
+
+    <div class="gallery">
+        <!-- Bilder unterschiedlicher Höhe -> daher der "versetzte" Effekt -->
+        <div class="gallery-item"><img src="images/gallery/atem1.jpg"></div>
+        <div class="gallery-item"><img src="images/gallery/atem2.jpg" alt=""></div>
+        <div class="gallery-item"><img src="images/gallery/blush.jpg" alt=""></div>
+        <div class="gallery-item"><img src="images/gallery/pharao_sleep.jpg" alt=""></div>
+        <div class="gallery-item"><img src="images/gallery/pharao_sleep_2.jpg" alt=""></div>
+        <div class="gallery-item"><img src="images/gallery/plantmorning.png" alt=""></div>
+        <div class="gallery-item"><img src="images/gallery/r_undercover_maf.png" alt=""></div>
+        <div class="gallery-item"><img src="images/gallery/rafa_motor_poster.png" alt=""></div>
+        <div class="gallery-item"><img src="images/gallery/Rafa_Profil.png" alt=""></div>
+        <div class="gallery-item"><img src="images/gallery/Rafa_Profil_bg.png" alt=""></div>
+        <div class="gallery-item"><img src="images/gallery/redraw chess logo1.png" alt=""></div>
+        <div class="gallery-item"><img src="images/gallery/atem1.jpg" alt=""></div>
+    </div>
+
+    <script>
+        // Jedem Bild eine leichte, gestaffelte Verzögerung geben,
+        // damit sie "nacheinander" statt alle gleichzeitig erscheinen.
+        const items = document.querySelectorAll('.gallery-item');
+
+        items.forEach((item, index) => {
+            item.style.transitionDelay = (index % 4) * 0.1 + 's';
+            // % 4, weil bei column-count:3 z.B. Item 0,3,6... eh in derselben Spalte
+            // starten und dadurch nicht ewig aufeinander warten
+        });
+
+        // IntersectionObserver: beobachtet, wann ein Element in den Viewport scrollt
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    observer.unobserve(entry.target); // Animation nur einmal abspielen
+                }
+            });
+        }, {
+            threshold: 0.15 // löst aus, sobald 15% des Elements sichtbar sind
+        });
+
+        items.forEach(item => observer.observe(item));
+    </script>
+
+
+
+</body>
+
+</html>
