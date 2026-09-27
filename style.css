@@ -20,6 +20,10 @@ body{
     background-color: bisque;
 }
 
+img {
+  -webkit-user-drag: none;  /* kein Drag-and-Drop auf den Desktop */
+  user-select: none;
+}
 
 
 /* home bar */
