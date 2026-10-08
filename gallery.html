@@ -7,7 +7,7 @@
     <title>OZEMI</title>
 
     <link rel="stylesheet" href="style.css">
-    
+
 </head>
 
 <body>
@@ -29,19 +29,24 @@
     <style>
         /* === Das Herzstück: Multi-Column-Layout === */
         .gallery {
-            column-count: 3;
-            /* 3 Spalten */
-            column-gap: 16px;
-            /* Abstand zwischen den Spalten */
+            display: flex;
+            gap: 16px;
             max-width: 1200px;
             margin: 0 auto;
             padding: 2vw 4vw;
         }
 
+        .gallery-column {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            flex: 1;
+            /* alle Spalten gleich breit */
+        }
+
         .gallery-item {
-            break-inside: avoid;
-            /* verhindert, dass ein Bild über 2 Spalten zerschnitten wird */
-            margin-bottom: 16px;
+
+            margin-bottom: 0;
             border-radius: 8px;
             overflow: hidden;
 
@@ -157,21 +162,34 @@
     </style>
 
 
-    <div class="gallery">
-        <!-- Bilder unterschiedlicher Höhe -> daher der "versetzte" Effekt -->
-        <div class="gallery-item"><img src="images/gallery/atem1.jpg"></div>
-        <div class="gallery-item"><img src="images/gallery/atem2.jpg" alt=""></div>
-        <div class="gallery-item"><img src="images/gallery/blush.jpg" alt=""></div>
-        <div class="gallery-item"><img src="images/gallery/pharao_sleep.jpg" alt=""></div>
-        <div class="gallery-item"><img src="images/gallery/pharao_sleep_2.jpg" alt=""></div>
-        <div class="gallery-item"><img src="images/gallery/plantmorning.png" alt=""></div>
-        <div class="gallery-item"><img src="images/gallery/r_undercover_maf.png" alt=""></div>
-        <div class="gallery-item"><img src="images/gallery/rafa_motor_poster.png" alt=""></div>
-        <div class="gallery-item"><img src="images/gallery/Rafa_Profil.png" alt=""></div>
-        <div class="gallery-item"><img src="images/gallery/Rafa_Profil_bg.png" alt=""></div>
-        <div class="gallery-item"><img src="images/gallery/redraw chess logo1.png" alt=""></div>
-        <div class="gallery-item"><img src="images/gallery/atem1.jpg" alt=""></div>
-    </div>
+    <div class="gallery" id="gallery"></div>
+
+    <!--
+        <div class="gallery-item"><img src="images/gallery/fully_rendered/plantmorning.png"></div>
+
+
+        <div class="gallery-item"><img src="images/gallery/fully_rendered/oktav_lounge.jpg"></div>
+        <div class="gallery-item"><img src="images/gallery/fully_rendered/raf_lounge.jpg"></div>
+
+        <div class="gallery-item"><img src="images/gallery/fully_rendered/elias_car.jpg"></div>
+        <div class="gallery-item"><img src="images/gallery/fully_rendered/istery_coffee.jpg"></div>
+        <div class="gallery-item"><img src="images/gallery/fully_rendered/max_sleep.jpg" alt=""></div>
+
+
+        <div class="gallery-item"><img src="images/gallery/fully_rendered/moto_gemalde.jpg" alt=""></div>
+        <div class="gallery-item"><img src="images/gallery/fully_rendered/rooftop.jpg" alt=""></div>
+
+
+
+        <div class="gallery-item"><img src="images/gallery/fully_rendered/mountains_1.jpg" alt=""></div>
+        <div class="gallery-item"><img src="images/gallery/fully_rendered/mountains_2.jpg" alt=""></div>
+        <div class="gallery-item"><img src="images/gallery/fully_rendered/mountains_3.jpg" alt=""></div>
+        <div class="gallery-item"><img src="images/gallery/fully_rendered/mountains_4.jpg" alt=""></div>
+        <div class="gallery-item"><img src="images/gallery/fully_rendered/mountains_5.jpg" alt=""></div>
+        <div class="gallery-item"><img src="images/gallery/fully_rendered/mountains_6.jpg" alt=""></div>
+        <div class="gallery-item"><img src="images/gallery/fully_rendered/mountains_7.jpg" alt=""></div>
+        <div class="gallery-item"><img src="images/gallery/fully_rendered/mountains_8.jpg" alt=""></div>
+-->
 
     <!-- Lightbox-Overlay: existiert nur einmal, Bild wird per JS ausgetauscht -->
     <div class="lightbox" id="lightbox">
@@ -185,35 +203,111 @@
 
 
     <script>
-        // Jedem Bild eine leichte, gestaffelte Verzögerung geben,
-        // damit sie "nacheinander" statt alle gleichzeitig erscheinen.
-        const items = document.querySelectorAll('.gallery-item');
 
-        items.forEach((item, index) => {
-            item.style.transitionDelay = (index % 4) * 0.1 + 's';
-            // % 4, weil bei column-count:3 z.B. Item 0,3,6... eh in derselben Spalte
-            // starten und dadurch nicht ewig aufeinander warten
-        });
 
-        // IntersectionObserver: beobachtet, wann ein Element in den Viewport scrollt
+        // Deine Bildpfade in der gewünschten Lese-Reihenfolge (Zeile für Zeile)
+        const imagePaths = [
+            "images/gallery/fully_rendered/plantmorning.png",
+            "images/gallery/fully_rendered/oktav_lounge.jpg",
+            "images/gallery/fully_rendered/raf_lounge.jpg",
+
+            "images/gallery/fully_rendered/elias_car.jpg",
+            "images/gallery/fully_rendered/istery_coffee.jpg",
+            "images/gallery/fully_rendered/max_sleep.jpg",
+
+            "images/gallery/fully_rendered/moto_gemalde.jpg",
+            "images/gallery/fully_rendered/rooftop.jpg",
+            "images/gallery/fully_rendered/throne.jpg",
+
+            "images/gallery/fully_rendered/mountains_1.jpg",
+            "images/gallery/fully_rendered/mountains_2.jpg",
+            "images/gallery/fully_rendered/mountains_3.jpg",
+            "images/gallery/fully_rendered/mountains_4.jpg",
+            "images/gallery/fully_rendered/mountains_5.jpg",
+            "images/gallery/fully_rendered/mountains_6.jpg",
+            "images/gallery/fully_rendered/mountains_7.jpg",
+            "images/gallery/fully_rendered/mountains_8.jpg",
+
+            "images/gallery/middle-sketch/blush.jpg",
+            "images/gallery/middle-sketch/redraw chess logo1.png",
+            "images/gallery/middle-sketch/redraw chess logo2.png",
+            "images/gallery/middle-sketch/white_raf_art.png",
+        ];
+
+        const gallery = document.getElementById('gallery');
+
+
+
+        function getColumnCount() {
+            if (window.innerWidth <= 420) return 1;
+            if (window.innerWidth <= 700) return 2;
+            return 3;
+        }
+
+
+
+        function buildGallery() {
+            const columnCount = getColumnCount();
+            gallery.innerHTML = ''; // alte Spalten leeren
+
+            // N leere Spalten-Container erstellen
+            const columns = [];
+            for (let i = 0; i < columnCount; i++) {
+                const col = document.createElement('div');
+                col.className = 'gallery-column';
+                gallery.appendChild(col);
+                columns.push(col);
+            }
+
+            // Bilder reihenweise verteilen: index % columnCount entscheidet die Spalte
+            imagePaths.forEach((path, index) => {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'gallery-item';
+
+                const img = document.createElement('img');
+                img.src = path;
+                img.addEventListener('click', () => openLightbox(index));
+
+                wrapper.appendChild(img);
+                columns[index % columnCount].appendChild(wrapper);
+
+                // Animation vorbereiten: ganze "Reihe" bekommt ähnliche Verzögerung
+                wrapper.style.transitionDelay = Math.floor(index / columnCount) * 0.1 + 's';
+
+                observer.observe(wrapper); // Scroll-Animation aktivieren
+            });
+        }
+
+        // IntersectionObserver bleibt identisch wie bisher
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
                     entry.target.classList.add('visible');
-                    observer.unobserve(entry.target); // Animation nur einmal abspielen
+                    observer.unobserve(entry.target);
                 }
             });
-        }, {
-            threshold: 0.15 // löst aus, sobald 15% des Elements sichtbar sind
-        });
+        }, { threshold: 0.15 });
 
-        items.forEach(item => observer.observe(item));
+        buildGallery();
+
+        // Bei Fenstergröße-Änderung neu verteilen (z.B. Handy drehen, Fenster resizen)
+        window.addEventListener('resize', buildGallery);
+
+
+
+
+
+
+
+
+
+
+
 
         // ===== Lightbox-Logik =====
 
         // Alle Bild-URLs der Galerie in ein Array packen, damit wir "vor/zurück" wissen
-        const galleryImages = Array.from(document.querySelectorAll('.gallery-item img'))
-            .map(img => img.src);
+        const galleryImages = imagePaths;
 
         const lightbox = document.getElementById('lightbox');
         const lightboxImg = document.getElementById('lightbox-img');
@@ -253,11 +347,7 @@
             updateLightboxImage();
         }
 
-        // Klick auf ein Galerie-Bild -> Lightbox öffnen an der richtigen Stelle
-        document.querySelectorAll('.gallery-item img').forEach((img, index) => {
-            img.addEventListener('click', () => openLightbox(index));
-        });
-
+        
         btnClose.addEventListener('click', closeLightbox);
         btnNext.addEventListener('click', showNext);
         btnPrev.addEventListener('click', showPrev);
