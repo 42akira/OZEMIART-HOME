@@ -180,34 +180,33 @@
 
 
         // Deine Bildpfade in der gewünschten Lese-Reihenfolge (Zeile für Zeile)
-        const imagePaths = [
-            "images/gallery/fully_rendered/plantmorning.png",
-            "images/gallery/fully_rendered/oktav_lounge.jpg",
-            "images/gallery/fully_rendered/raf_lounge.jpg",
+        const images = [
+            { thumb: "images/gallery/fully_rendered/thumbs/plantmorning.jpg", full: "images/gallery/fully_rendered/plantmorning.png" },
+            { thumb: "images/gallery/fully_rendered/thumbs/oktav_lounge.jpg", full: "images/gallery/fully_rendered/oktav_lounge.jpg" },
+            { thumb: "images/gallery/fully_rendered/thumbs/raf_lounge.jpg", full: "images/gallery/fully_rendered/raf_lounge.jpg" },
 
-            "images/gallery/fully_rendered/elias_car.jpg",
-            "images/gallery/fully_rendered/istery_coffee.jpg",
-            "images/gallery/fully_rendered/max_sleep.jpg",
+            { thumb: "images/gallery/fully_rendered/thumbs/elias_car.jpg", full: "images/gallery/fully_rendered/elias_car.jpg" },
+            { thumb: "images/gallery/fully_rendered/thumbs/istery_coffee.jpg", full: "images/gallery/fully_rendered/istery_coffee.jpg" },
+            { thumb: "images/gallery/fully_rendered/thumbs/max_sleep.jpg", full: "images/gallery/fully_rendered/max_sleep.jpg" },
 
-            "images/gallery/fully_rendered/moto_gemalde.jpg",
-            "images/gallery/fully_rendered/rooftop.jpg",
-            "images/gallery/fully_rendered/throne.jpg",
+            { thumb: "images/gallery/fully_rendered/thumbs/moto_gemalde.jpg", full: "images/gallery/fully_rendered/moto_gemalde.jpg" },
+            { thumb: "images/gallery/fully_rendered/thumbs/rooftop.jpg", full: "images/gallery/fully_rendered/rooftop.jpg" },
+            { thumb: "images/gallery/fully_rendered/thumbs/throne.jpg", full: "images/gallery/fully_rendered/throne.jpg" },
 
-            "images/gallery/fully_rendered/mountains_1.jpg",
-            "images/gallery/fully_rendered/mountains_2.jpg",
-            "images/gallery/fully_rendered/mountains_3.jpg",
-            "images/gallery/fully_rendered/mountains_4.jpg",
-            "images/gallery/fully_rendered/mountains_5.jpg",
-            "images/gallery/fully_rendered/mountains_6.jpg",
-            "images/gallery/fully_rendered/mountains_7.jpg",
-            "images/gallery/fully_rendered/mountains_8.jpg",
+            { thumb: "images/gallery/fully_rendered/thumbs/mountains_1.jpg", full: "images/gallery/fully_rendered/mountains_1.jpg" },
+            { thumb: "images/gallery/fully_rendered/thumbs/mountains_2.jpg", full: "images/gallery/fully_rendered/mountains_2.jpg" },
+            { thumb: "images/gallery/fully_rendered/thumbs/mountains_3.jpg", full: "images/gallery/fully_rendered/mountains_3.jpg" },
+            { thumb: "images/gallery/fully_rendered/thumbs/mountains_4.jpg", full: "images/gallery/fully_rendered/mountains_4.jpg" },
+            { thumb: "images/gallery/fully_rendered/thumbs/mountains_5.jpg", full: "images/gallery/fully_rendered/mountains_5.jpg" },
+            { thumb: "images/gallery/fully_rendered/thumbs/mountains_6.jpg", full: "images/gallery/fully_rendered/mountains_6.jpg" },
+            { thumb: "images/gallery/fully_rendered/thumbs/mountains_7.jpg", full: "images/gallery/fully_rendered/mountains_7.jpg" },
+            { thumb: "images/gallery/fully_rendered/thumbs/mountains_8.jpg", full: "images/gallery/fully_rendered/mountains_8.jpg" },
 
-            "images/gallery/middle-sketch/blush_sign.jpg",
-            "images/gallery/middle-sketch/sign redraw chess logo1.jpg",
-            "images/gallery/middle-sketch/sign redraw chess logo2.jpg",
-            "images/gallery/middle-sketch/white_raf_art.png",
+            { thumb: "images/gallery/middle-sketch/thumbs/blush_sign.jpg", full: "images/gallery/middle-sketch/blush_sign.jpg" },
+            { thumb: "images/gallery/middle-sketch/thumbs/sign_redraw_chess_1.jpg", full: "images/gallery/middle-sketch/sign_redraw_chess_1.jpg" },
+            { thumb: "images/gallery/middle-sketch/thumbs/sign_redraw_chess_2.jpg", full: "images/gallery/middle-sketch/sign_redraw_chess_2.jpg" },
+            { thumb: "images/gallery/middle-sketch/thumbs/white_raf_art.jpg", full: "images/gallery/middle-sketch/white_raf_art.png" },
         ];
-
         const gallery = document.getElementById('gallery');
 
 
@@ -234,19 +233,20 @@
             }
 
             // Bilder reihenweise verteilen: index % columnCount entscheidet die Spalte
-            imagePaths.forEach((path, index) => {
+            images.forEach((item, index) => {
                 const wrapper = document.createElement('div');
                 wrapper.className = 'gallery-item';
 
                 const img = document.createElement('img');
-                img.src = path;
+                img.src = item.thumb;
+                img.loading = "lazy"
+                img.decoding = "async"
+
                 img.addEventListener('click', () => openLightbox(index));
 
                 wrapper.appendChild(img);
                 columns[index % columnCount].appendChild(wrapper);
 
-                // Animation vorbereiten: ganze "Reihe" bekommt ähnliche Verzögerung
-                wrapper.style.transitionDelay = Math.floor(index / columnCount) * 0.1 + 's';
 
                 observer.observe(wrapper); // Scroll-Animation aktivieren
             });
@@ -289,7 +289,7 @@
         // ===== Lightbox-Logik =====
 
         // Alle Bild-URLs der Galerie in ein Array packen, damit wir "vor/zurück" wissen
-        const galleryImages = imagePaths;
+
 
         const lightbox = document.getElementById('lightbox');
         const lightboxImg = document.getElementById('lightbox-img');
@@ -300,6 +300,9 @@
 
         let currentIndex = 0;
         let zoomScale = 1; // aktueller Zoom-Faktor
+
+
+
 
         function openLightbox(index) {
             currentIndex = index;
@@ -313,19 +316,35 @@
         }
 
         function updateLightboxImage() {
-            lightboxImg.src = galleryImages[currentIndex];
+            const item = images[currentIndex]
+
+            lightboxImg.src = item.thumb
             lightboxImg.style.transform = 'scale(1)';
             zoomScale = 1;
-            lightboxCounter.textContent = (currentIndex + 1) + ' / ' + galleryImages.length;
+
+
+            // Original im Hintergrund laden und austauschen, wenn fertig
+            const full = new Image();
+            full.onload = () => {
+                if (images[currentIndex] === item) {   // nur, wenn man nicht schon weitergeklickt hat
+                    lightboxImg.src = item.full;
+                }
+            };
+            full.src = item.full;
+
+
+
+
+            lightboxCounter.textContent = (currentIndex + 1) + ' / ' + images.length;
         }
 
         function showNext() {
-            currentIndex = (currentIndex + 1) % galleryImages.length; // springt am Ende wieder zu 0
+            currentIndex = (currentIndex + 1) % images.length; // springt am Ende wieder zu 0
             updateLightboxImage();
         }
 
         function showPrev() {
-            currentIndex = (currentIndex - 1 + galleryImages.length) % galleryImages.length;
+            currentIndex = (currentIndex - 1 + images.length) % images.length;
             updateLightboxImage();
         }
 
